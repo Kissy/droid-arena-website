@@ -1,0 +1,397 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>DroidArena - Help</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="css/droidarena.css" type="text/css" rel="stylesheet" />
+    <link href="css/bootstrap.css" type="text/css" rel="stylesheet" />
+    <link href="css/bootstrap-responsive.css" type="text/css" rel="stylesheet" />
+    <link href="css/prettify.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="#">DroidArena</a>
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="play.html">Play</a></li>
+                    <li><a href="stats.html">Stats</a></li>
+                    <li class="active"><a href="#">Help</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Droid Arena API</h1>
+    </div>
+
+    <p>The Droid Arena API are simple GET requests returning a JSON response. The base URL is <code>http://api-droid-arena.kissy.fr</code>.<br >
+       There is three kind of commands, <b>Account</b>, <b>General</b> and <b>Order</b>. The <b>General</b> commands give you informations about the running game.
+       The <b>Order</b> commands is the entry point to actually play the game. At last, the <b>User</b> commands allow you to create your account and manage your user information.
+       Game rules, round execution flow and commands are explained and detailed below.</p>
+
+    <h2>Round timeline</h2>
+    <p>One Round last <b>10</b> minutes including <b>9</b> minutes while orders are allowed and <b>1</b> minute to reset it.
+       After the reset a new round start over with the exact same pattern. The round is always scheduled to start at every <b>10</b> minutes starting from 0.
+       The associated CronTab is <code>*/10 * * * *</code>. Round is updated every <b>2 seconds</b>. During <b>even</b> seconds orders are allowed
+       and during <b>odd</b> seconds order are processed. List and History (General) commands are allowed only during &laquo;Round - Order&raquo;. Order commands are allowed only during &laquo;Step - Order&raquo;.
+       User commands are allowed everytime but will only affects next round.</p>
+    <div class="timeline">
+        <ul class="events">
+            <li style="width: 70%; left: 0;">Round - Order <em>(00:00 - 09:00, )</em></li>
+            <li class="no-clear" style="width: 20%; left: 0;">Round - Reset <em>(1m)</em></li>
+            <li style="width: 20%; left: 0;">Step <em>(2s)</em></li>
+            <li class="no-clear" style="width: 15%; left: 0;">Step <em>(2s)</em></li>
+            <li class="no-clear" style="width: 2%; left: 0;">&nbsp;</li>
+            <li class="no-clear" style="width: 2%; left: 0;">&nbsp;</li>
+            <li class="no-clear" style="width: 2%; left: 0;">&nbsp;</li>
+            <li class="no-clear" style="width: 2%; left: 0;">&nbsp;</li>
+            <li class="no-clear" style="width: 2%; left: 0;">&nbsp;</li>
+            <li class="no-clear" style="width: 4%; left: 0;">&nbsp;</li>
+            <li class="no-clear" style="width: 20%; left: 0;">Step <em>(2s)</em></li>
+            <li style="width: 10%; left: 0;">Order <em>(1s)</em></li>
+            <li class="no-clear" style="width: 10%; left: 10%;">Order <em>(1s)</em></li>
+            <li class="no-clear" style="width: 10%; left: 30%;">Order <em>(1s)</em></li>
+            <li style="width: 10%; left: 10%;">Break <em>(1s)</em></li>
+            <li class="no-clear" style="width: 5%; left: 20%;">&nbsp;</li>
+            <li class="no-clear" style="width: 2%; left: 33%;">&nbsp;</li>
+            <li class="no-clear" style="width: 10%; left: 43%;">Break <em>(1s)</em></li>
+        </ul>
+
+        <ul class="intervals">
+            <li><span>00:00</span></li>
+            <li><span>00:01</span></li>
+            <li><span>00:02</span></li>
+            <li class="long"><span>...</span></li>
+            <li><span>08:58</span></li>
+            <li><span>08:59</span></li>
+            <li><span>09:00</span></li>
+            <li class="last"><span>10:00</span></li>
+        </ul>
+
+        <br class="clear" />
+    </div>
+
+    <h2>General Commands</h2>
+    <p>In order to get informations about the current running round or the current server state, you can have some commands to either
+    retreive Time informations, get the List of playing users, or retrieve someone's History.</p>
+    <div class="row">
+        <div class="span4">
+            <h3>Time : <small>/time</small></h3>
+            <p>Get information about round and server time.
+                One round last <b>9&nbsp;+&nbsp;1</b> minutes, where players have <b>9</b> minutes to give orders and <b>1</b> minute to reset round.
+                Orders can only be placed only during even seconds. Odd seconds are used to process orders.</p>
+        </div>
+        <div class="span4">
+            <h3>List : <small>/list</small></h3>
+            <p>Get the list of active players with their respective id, name, score and previous order.
+                The response only contain one parameters <code>"p"</code> which contains the array of player object.</p>
+        </div>
+        <div class="span4">
+            <h3>History : <small>/history</small></h3>
+            <p>Display your entire history for the current round. The order time last <b>9</b> minutes, and orders
+            can be given every 2s. We have a total of <b>270</b> possible orders. History orders are listed chronologically.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span4">
+            <h6>Input</h6>
+            <p>No input parameters</p>
+        </div>
+        <div class="span4">
+            <h6>Input</h6>
+            <p>No input parameters</p>
+        </div>
+        <div class="span4">
+            <h6>Input</h6>
+            <p>No input parameters</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span4">
+            <h6>Output</h6>
+            <pre class="prettyprint linenums">{
+    "r": "1342625940000",
+    "u": "1342625693000",
+    "c": "1342625691805"
+}</pre>
+            <ul>
+                <li><code>"r"</code> is the round end time.</li>
+                <li><code>"u"</code> is the next update time.</li>
+                <li><code>"c"</code> is the current server time.</li>
+            </ul>
+        </div>
+        <div class="span4">
+            <h6>Output</h6>
+            <pre class="prettyprint linenums">{
+  "p": [
+    {
+      "_id": { "$oid": "4ff...281" },
+      "n": "Test 2",
+      "s": 0,
+      "o": { "c": 0, "t": null }
+    },
+    ...
+  ]
+}</pre>
+            <ul>
+                <li><code>"p"</code> is one player object (repeated).</li>
+                <li><code>"_id"</code> is the player id.</li>
+                <li><code>"n"</code> is the player name.</li>
+                <li><code>"s"</code> is the player score.</li>
+                <li><code>"o.c"</code> is the player last order command.</li>
+                <li><code>"o.t"</code> is the player last order target.</li>
+            </ul>
+        </div>
+        <div class="span4">
+            <h6>Output</h6>
+            <pre class="prettyprint">{
+  "_id": { "$oid": "4ff...997" },
+  "n": "Test7",
+  "h": [
+    { "c": 0, "t": null },
+    ...
+    { "c": 2, "t": { "$oid": "4ff...998" } }
+  ]
+}</pre>
+            <ul>
+                <li><code>"_id"</code> is the player id.</li>
+                <li><code>"n"</code> is the player name.</li>
+                <li><code>"h"</code> is the history object (270 times).</li>
+                <li><code>"h.c"</code> is the history order command.</li>
+                <li><code>"h.t"</code> is the history order target.</li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span4">
+            <br />
+        </div>
+        <div class="span4">
+            <h6>Misc</h6>
+            <div class="alert alert-block">
+                <h4 class="alert-heading">Restrictions</h4>
+                <p>List command can only be called during &laquo;Round - Order&raquo; time.</p>
+            </div>
+        </div>
+        <div class="span4">
+            <h6>Misc</h6>
+            <div class="alert alert-block">
+                <h4 class="alert-heading">Restrictions</h4>
+                <p>History command can only be called during &laquo;Round - Order&raquo; time.</p>
+            </div>
+        </div>
+    </div>
+
+    <br />
+
+    <h2>Order Commands</h2>
+    <div class="alert alert-block">
+        <h4 class="alert-heading">Restrictions</h4>
+        <ul>
+            <li>Order commands can only be called once per &laquo;Order&raquo; time, per player. All even seconds belongs to the &laquo;Order&raquo; time.</li>
+            <li>Order commands are not allowed during &laquo;Round Reset&raquo;.</li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="span3">
+            <h3>Plus : <small>/plus/{{TARGET_ID}}</small></h3>
+            <p>Make your plus order for the current step. This will add one point to the target's bonus for this step.</p>
+        </div>
+        <div class="span3">
+            <h3>Minus : <small>/minus/{{target_id}}</small></h3>
+            <p>Make your minus order for the current step. This will remove one point to the target's bonus for this step.</p>
+        </div>
+        <div class="span3">
+            <h3>Opposite : <small>/opposite/{{target_id}}</small></h3>
+            <p>Make your opposite order for the current step. This will inverse the sign of the target's bonus for this step.</p>
+        </div>
+        <div class="span3">
+            <h3>Double : <small>/double/{{target_id}}</small></h3>
+            <p>Make your double order for the current step. This will double the target's bonus for this step.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span3">
+            <h6>Input</h6>
+            <p><code>{{target_id}}</code> The player's id to target</p>
+        </div>
+        <div class="span3">
+            <h6>Input</h6>
+            <p>No input parameters</p>
+        </div>
+        <div class="span3">
+            <h6>Input</h6>
+            <p>No input parameters</p>
+        </div>
+        <div class="span3">
+            <h6>Input</h6>
+            <p>No input parameters</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="span3">
+                        <pre class="prettyprint linenums">{
+    "r": "1341505740000",
+    "u": "1341505208000",
+    "c": "1341505207697"
+}</pre>
+            <p>The response parameters are :</p>
+            <ul>
+                <li><code>"r"</code> is the round end time.</li>
+                <li><code>"u"</code> is the next update time.</li>
+                <li><code>"c"</code> is the current server time.</li>
+            </ul>
+        </div>
+        <div class="span3">
+            <p>Get the list of active players with their respective
+                id, name, score and previous order.
+                The response only contain one parameters <code>"p"</code>
+                which contains the array of player object.</p>
+            <pre class="prettyprint linenums">{
+  "p": [
+    {
+      "_id": { "$oid": "4ff...281" },
+      "n": "Test 2",
+      "s": 0,
+      "o": { "c": 0, "t": null }
+    },
+    ...
+  ]
+}</pre>
+            <p>The player object parameters are :</p>
+            <ul>
+                <li><code>"_id"</code> is the player id.</li>
+                <li><code>"n"</code> is the player name.</li>
+                <li><code>"s"</code> is the player score.</li>
+                <li><code>"o.c"</code> is the player last order command.</li>
+                <li><code>"o.t"</code> is the player last order target.</li>
+            </ul>
+        </div>
+        <div class="span3">
+            <pre class="prettyprint">{
+    "r": "1341505740000",
+    "u": "1341505208000",
+    "c": "1341505207697"
+}</pre>
+        </div>
+        <div class="span3">
+            <pre class="prettyprint">{
+    "r": "1341505740000",
+    "u": "1341505208000",
+    "c": "1341505207697"
+}</pre>
+        </div>
+    </div>
+
+    <br />
+
+    <h2>User Commands</h2>
+    <div class="row">
+        <div class="span3">
+            <h3>Register</h3>
+            <p>Create a new user with a given Name and Token.</p>
+            <pre class="prettyprint linenums">{
+    "r": "1341505740000",
+    "u": "1341505208000",
+    "c": "1341505207697"
+}</pre>
+            <p>The response parameters are :</p>
+            <ul>
+                <li><code>"r"</code> is the round end time.</li>
+                <li><code>"u"</code> is the next update time.</li>
+                <li><code>"c"</code> is the current server time.</li>
+            </ul>
+        </div>
+        <div class="span3">
+            <h3>User</h3>
+            <p>Get your user information.</p>
+            <pre class="prettyprint linenums">{
+  "p": [
+    {
+      "_id": { "$oid": "4ff...281" },
+      "n": "Test 2",
+      "s": 0,
+      "o": { "c": 0, "t": null }
+    },
+    ...
+  ]
+}</pre>
+            <p>The player object parameters are :</p>
+            <ul>
+                <li><code>"_id"</code> is the player id.</li>
+                <li><code>"n"</code> is the player name.</li>
+                <li><code>"s"</code> is the player score.</li>
+                <li><code>"o.c"</code> is the player last order command.</li>
+                <li><code>"o.t"</code> is the player last order target.</li>
+            </ul>
+        </div>
+        <div class="span3">
+            <h3>Name</h3>
+            <p>Change your user name.<br />
+            The name will not be updated instantly in the current round,
+            however it will be used the next time you participate in a round.</p>
+            <pre class="prettyprint">{
+    "s": "success"
+}</pre>
+        </div>
+        <div class="span3">
+            <h3>Status</h3>
+            <p>Change your user status.<br />
+            If your status is equals to <b>true</b> you will participate in next rounds.
+            If your status is set to anything else, you will not participate in next rounds.</p>
+            <pre class="prettyprint">{
+    "r": "1341505740000",
+    "u": "1341505208000",
+    "c": "1341505207697"
+}</pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <footer>
+        <p>&copy; Company 2012</p>
+    </footer>
+
+</div> <!-- /container -->
+
+<script src="js/jquery.js"></script>
+<script src="js/jquery.rotate.js"></script>
+<script src="js/prettify.js" type="text/javascript"></script>
+<!--<script src="js/bootstrap-transition.js"></script>
+<script src="js/bootstrap-alert.js"></script>
+<script src="js/bootstrap-modal.js"></script>
+<script src="js/bootstrap-dropdown.js"></script>
+<script src="js/bootstrap-scrollspy.js"></script>
+<script src="js/bootstrap-tab.js"></script>
+<script src="js/bootstrap-tooltip.js"></script>
+<script src="js/bootstrap-popover.js"></script>
+<script src="js/bootstrap-button.js"></script>
+<script src="js/bootstrap-collapse.js"></script>
+<script src="js/bootstrap-carousel.js"></script>
+<script src="js/bootstrap-typeahead.js"></script>-->
+<script src="http://code.angularjs.org/1.0.1/angular-1.0.1.min.js"></script>
+<script src="js/droidarena.js"></script>
+
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+<script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+</body>
+</html>

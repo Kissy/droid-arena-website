@@ -1,0 +1,183 @@
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+.ng-cloak {
+    display: none;
+}
+.center-text {
+    text-align: center !important;
+}
+.right-text {
+    text-align: right !important;
+}
+.alert-info {
+    background-color: #D9EDF7 !important;
+}
+.no-margin {
+    margin: 0 !important;
+}
+.no-border-top {
+    border-top: 0 black none !important;
+}
+
+/**
+* CSS Timer Styles
+*/
+.timer {
+    height: 200px;
+    width: 200px;
+    position: relative;
+    overflow: hidden;
+    display: block;
+    margin: 0 auto;
+}
+
+.timer .rotate {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 0;
+    top: 0;
+}
+.timer .rotate-cache {
+    display: block;
+}
+.timer.half-rotate .rotate-cache {
+    display: none;
+}
+
+.timer .cache {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    width: 100px;
+    height: 200px;
+    background-color: whiteSmoke;
+    left: 0;
+}
+.timer.half-rotate .cache {
+    display: block;
+}
+
+.timer .timer-display {
+    position: absolute;
+    width: 200px;
+    z-index: 3;
+    font-size: 30px;
+    line-height: 30px;
+    text-align: center;
+    top: 85px;
+    left: 0;
+}
+
+.timer .bg {
+    width: 100px;
+    height: 200px;
+    background-color: #FFF;
+}
+.timer .left-bg {
+}
+.timer .right-bg {
+    margin-left: 100px;
+}
+
+.timer.green.half-rotate .left-bg {
+    background: url(../img/bg_orange.png) no-repeat left top;
+}
+.timer.green .left-bg {
+    background: url(../img/bg_green.png) no-repeat left top;
+}
+.timer.blue .left-bg {
+    background: url(../img/bg_blue.png) no-repeat left top;
+}
+
+.timer.green .right-bg {
+    background: url(../img/bg_orange.png) no-repeat right top;
+}
+.timer.blue .right-bg {
+    background: url(../img/bg_blue.png) no-repeat right top;
+}
+
+/**
+* CSS Timeline Styles
+*/
+.timeline {
+    padding-bottom: 20px;
+}
+.timeline .clear {
+    clear: both;
+}
+ul.events {
+    list-style-type: none;
+    margin: 0;
+    padding: 0 0 20px 0;
+    display: block;
+}
+
+ul.events li {
+    -webkit-border-radius: 11px;
+    -moz-border-radius: 11px;
+    border-radius: 11px;
+    background: #eee;
+    border: 1px solid #ddd;
+    color: #707070;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 6px;
+    padding: 3px 0;
+    position: relative;
+    text-align: center;
+    float: left;
+    clear: both;
+}
+
+ul.events li.no-clear {
+    clear: none;
+}
+
+ul.events li em {
+    color: #aaa;
+    font-weight: normal;
+    font-size: 0.9em;
+}
+
+ul.intervals {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: block;
+    clear: both;
+}
+
+ul.intervals li {
+    background: #fff url(/images/1x1_eee.gif) repeat-x left 10%;
+    border-left: 1px solid #ccc;
+    color: #999;
+    float: left;
+    font-size: 1.2em;
+    margin: 0;
+    padding: 15px 0;
+    width: 10%;
+}
+ul.intervals li span {
+    padding-left: 5px;
+}
+ul.intervals li.long {
+    width: 20%;
+    text-align: center;
+}
+ul.intervals li.last {
+    float: right;
+}
+
+/**
+* Canva loader
+*/
+.sonic-loader-container {
+    margin-top: 40px;
+}
+.sonic-loader-container canvas {
+    display: block !important;
+    margin: auto;
+}
