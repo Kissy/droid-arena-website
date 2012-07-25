@@ -38,7 +38,7 @@
         <h1>Previous Rounds</h1>
     </div>
 
-    <table id="results" class="table table-bordered table-striped ng-cloak">
+    <table class="table table-bordered table-striped ng-cloak">
         <thead>
         <tr>
             <th>#</th>
@@ -46,14 +46,15 @@
             <th>First</th>
             <th>Second</th>
             <th>Third</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
         <tr class="ng-show: roundsLoading && rounds.length == 0;">
-            <td colspan="5" class="center-text">Loading ...</td>
+            <td colspan="6" class="center-text">Loading ...</td>
         </tr>
         <tr class="ng-show: !roundsLoading && rounds.length == 0;">
-            <td colspan="5" class="center-text">No previous rounds</td>
+            <td colspan="6" class="center-text">No previous rounds</td>
         </tr>
         <tr ng-repeat="round in rounds">
             <td>{{$index + 1}}</td>
@@ -61,6 +62,9 @@
             <td>{{round.p.0.n}}</td>
             <td>{{round.p.1.n}}</td>
             <td>{{round.p.2.n}}</td>
+            <td>
+                <a href="#" ng-click="showDetails(round)">View all players</a>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -69,6 +73,34 @@
         <span class="span12 center-text">
             <button class="btn ng-class: loading && 'disabled' || ''" ng-click="showMore()">Show more</button>
         </span>
+    </div>
+
+    <div id="roundDetailsModal" class="modal hide">
+        <div class="modal-header">
+            <button class="close" close-round-details>x</button>
+            <h3>Round details - {{round._id.$oid | objectIdToTime | date:'dd/MM/yyyy H:mm:00'}}</h3>
+        </div>
+        <div class="modal-body">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="player in round.p">
+                    <td>{{$index + 1}}</td>
+                    <td>{{player.n}}</td>
+                    <td>{{player.s}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" close-round-details>Close</a>
+        </div>
     </div>
 
     <hr>

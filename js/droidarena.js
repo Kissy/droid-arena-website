@@ -255,8 +255,14 @@ droidarena.directive('sonicLoader', function() {
     };
 });
 
+/**
+ * Filter an object ID and extract the created time.
+ */
 droidarena.filter('objectIdToTime', function() {
     return function(input) {
+        if (!input) {
+            return "";
+        }
         return parseInt(input.substring(0, 8), 16) * 1000 - 540000;
     }
 });
@@ -301,6 +307,12 @@ var RoundListCtrl = ['$scope', '$http', '$timeout', function RoundListCtrl($scop
     $scope.roundsLoading = true;
     $scope.displayShowMore = false;
 
+    $scope.showDetails = function(round) {
+        $scope.round = round;
+        $('body').addClass('modal-open');
+        $('#roundDetailsModal').css("display", "block");
+    };
+
     $scope.fetchRounds = function() {
         $scope.roundsLoading = true;
         $http.get(BASE_URL + 'rounds/' + pagination).success(function(data) {
@@ -317,4 +329,16 @@ var RoundListCtrl = ['$scope', '$http', '$timeout', function RoundListCtrl($scop
 
     $scope.fetchRounds();
 }];
+
+/**
+ * Close the opened modal.
+ */
+droidarena.directive('closeRoundDetails', function () {
+    return function ($scope, $element, $attributes) {
+        angular.element($element).bind("click", function () {
+            $('#roundDetailsModal').css("display", "none");
+            $('body').removeClass('modal-open');
+        });
+    };
+});
 
