@@ -20,6 +20,9 @@ body {
 .no-border-top {
     border-top: 0 black none !important;
 }
+.float-right {
+    float: right;
+}
 
 /**
 * CSS Timer Styles
