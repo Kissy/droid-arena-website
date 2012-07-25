@@ -110,8 +110,8 @@
                 </table>
             </div>
         </div>
-        <div class="span9" ng-switch="roundRunning">
-            <div class="ng-cloak" ng-switch-when="true">
+        <div class="span9">
+            <div class="ng-cloak ng-show: roundRunning;">
                 <div class="well center-text">
                     <div class="row-fluid">
                         <div class="span6">
@@ -161,8 +161,11 @@
                         <th>Score</th>
                     </tr>
                     </thead>
-                    <tbody ng-switch="players.length">
-                    <tr ng-switch-when="0">
+                    <tbody>
+                    <tr class="ng-show: playersLoading && players.length == 0;">
+                        <td colspan="5" class="center-text">Loading ...</td>
+                    </tr>
+                    <tr class="ng-show: !playersLoading && players.length == 0;">
                         <td colspan="5" class="center-text">No players</td>
                     </tr>
                     <tr ng-repeat="player in players">
@@ -176,7 +179,7 @@
                 </table>
             </div>
 
-            <div class="hero-unit alert alert-info ng-cloak ng-show: !loading;" ng-switch-when="false">
+            <div class="hero-unit alert alert-info ng-cloak ng-show: !loading && !roundRunning;">
                 <h1 class="center-text" ng-switch="time-synchronized">
                     Next round start at <br />
                     <span ng-switch-when="false">...</span>

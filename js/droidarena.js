@@ -1,5 +1,5 @@
 var BASE_URL = "http://api-droid-arena.kissy.fr/";
-//BASE_URL = "http://localhost:8080/";
+BASE_URL = "http://localhost:8080/";
 
 var BIG_LOADER_SETTINGS = {
     width: 100,
@@ -255,6 +255,12 @@ droidarena.directive('sonicLoader', function() {
     };
 });
 
+droidarena.filter('objectIdToTime', function() {
+    return function(input) {
+        return parseInt(input.substring(0, 8), 16) * 1000 - 540000;
+    }
+});
+
 /**
  * Player controller.
  * Handle the list of players update.
@@ -262,9 +268,15 @@ droidarena.directive('sonicLoader', function() {
  * @type {Array} The list of injection.
  */
 var PlayerListCtrl = ['$scope', '$http', '$timeout', function PlayerListCtrl($scope, $http, $timeout) {
+    $scope.players = [];
+    $scope.playersLoading = true;
+
     $scope.refreshPlayers = function() {
+        $scope.players = [];
+        $scope.playersLoading = true;
         $http.get(BASE_URL + 'list').success(function(data) {
             $scope.players = data.p;
+            $scope.playersLoading = false;
         });
     };
 
@@ -275,3 +287,34 @@ var PlayerListCtrl = ['$scope', '$http', '$timeout', function PlayerListCtrl($sc
         }
     });
 }];
+
+/**
+ * Round controller.
+ * Handle the list of previous rounds.
+ *
+ * @type {Array} The list of injection.
+ */
+var RoundListCtrl = ['$scope', '$http', '$timeout', function RoundListCtrl($scope, $http, $timeout) {
+    var pagination = 0;
+
+    $scope.rounds = [];
+    $scope.roundsLoading = true;
+    $scope.displayShowMore = false;
+
+    $scope.fetchRounds = function() {
+        $scope.roundsLoading = true;
+        $http.get(BASE_URL + 'rounds/' + pagination).success(function(data) {
+            $scope.rounds.push.apply($scope.rounds, data.r);
+            $scope.roundsLoading = false;
+            $scope.displayShowMore = data.r.length == 10;
+        });
+    };
+
+    $scope.showMore = function() {
+        pagination += 10;
+        $scope.fetchRounds();
+    };
+
+    $scope.fetchRounds();
+}];
+

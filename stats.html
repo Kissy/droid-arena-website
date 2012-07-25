@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en" ng-app="droidarena" ng-controller="stats">
+<html lang="en" ng-app="droidarena">
 <head>
     <meta charset="utf-8">
     <title>DroidArena</title>
@@ -24,8 +24,8 @@
             <div class="nav-collapse">
                 <ul class="nav">
                     <li><a href="/">Home</a></li>
-                    <li class="active"><a href="#">Play</a></li>
-                    <li><a href="stats.html">Stats</a></li>
+                    <li><a href="play.html">Play</a></li>
+                    <li class="active"><a href="#">Stats</a></li>
                     <li><a href="help.html">Help</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
@@ -33,12 +33,12 @@
     </div>
 </div>
 
-<div class="container" ng-controller="StatsCtrl">
+<div class="container" ng-controller="RoundListCtrl">
     <div class="page-header">
         <h1>Previous Rounds</h1>
     </div>
 
-    <table id="results" class="table table-bordered table-striped ng-show: !loading;">
+    <table id="results" class="table table-bordered table-striped ng-cloak">
         <thead>
         <tr>
             <th>#</th>
@@ -48,19 +48,28 @@
             <th>Third</th>
         </tr>
         </thead>
-        <tbody ng-switch="players.length">
-        <tr ng-switch-when="0">
-            <td colspan="5" class="center-text">No results</td>
+        <tbody>
+        <tr class="ng-show: roundsLoading && rounds.length == 0;">
+            <td colspan="5" class="center-text">Loading ...</td>
         </tr>
-        <tr ng-repeat="player in players">
-            <td>{{player._id.$oid}}</td>
-            <td>{{player.n}}</td>
-            <td>{{player.o.c}}</td>
-            <td>{{player.o.t.$oid}}</td>
-            <td>{{player.s}}</td>
+        <tr class="ng-show: !roundsLoading && rounds.length == 0;">
+            <td colspan="5" class="center-text">No previous rounds</td>
+        </tr>
+        <tr ng-repeat="round in rounds">
+            <td>{{$index + 1}}</td>
+            <td>{{round._id.$oid | objectIdToTime | date:'dd/MM/yyyy H:mm:00'}}</td>
+            <td>{{round.p.0.n}}</td>
+            <td>{{round.p.1.n}}</td>
+            <td>{{round.p.2.n}}</td>
         </tr>
         </tbody>
     </table>
+
+    <div class="row" ng-show="displayShowMore">
+        <span class="span12 center-text">
+            <button class="btn ng-class: loading && 'disabled' || ''" ng-click="showMore()">Show more</button>
+        </span>
+    </div>
 
     <hr>
 
