@@ -1,7 +1,11 @@
 <div class="page-header">
-    <h1>Round Details <small>{{subTitle | objectIdToTime | date:'dd/MM/yyyy H:mm:00'}}</small></h1>
+    <h1>Round Details</h1>
 </div>
 
+<h2>
+    Round date : <small>{{subTitle | objectIdToTime | date:'dd/MM/yyyy H:mm:00'}}</small>
+    <a class="btn float-right top-margin-small" href="#">Back</a>
+</h2>
 <table class="table table-bordered table-striped ng-cloak">
     <thead>
     <tr>
@@ -25,8 +29,3 @@
     </tbody>
 </table>
 
-<div class="row">
-    <span class="span12 center-text">
-        <a class="btn" href="#">Back</a>
-    </span>
-</div>

@@ -133,20 +133,20 @@ function RoundListCtrl($scope, $location, $routeParams, roundsDataService) {
  * @type {Array} The list of injection.
  */
 var RoundHistoryCtrl = ['$scope', '$location', '$routeParams', 'roundsDataService',
-    function RoundListCtrl($scope, $location, $routeParams, roundsDataService) {
-        var round = roundsDataService.data[$routeParams.roundId];
-        if (!round) {
-            $location.path("/");
-            return;
-        }
-        var player = round.p[$routeParams.playerId];
-        if (!player) {
-            $location.path("/");
-            return;
-        }
-        $scope.subTitle = player.n;
-        $scope.roundId = $routeParams.roundId;
-        $scope.playerId = $routeParams.playerId;
-        $scope.history = player.h;
-    }];
+function RoundListCtrl($scope, $location, $routeParams, roundsDataService) {
+    var round = roundsDataService.data[$routeParams.roundId];
+    if (!round) {
+        $location.path("/");
+        return;
+    }
+    var player = round.p[$routeParams.playerId];
+    if (!player) {
+        $location.path("/");
+        return;
+    }
+    $scope.subTitle = player.n;
+    $scope.roundId = $routeParams.roundId;
+    $scope.playerId = $routeParams.playerId;
+    $scope.history = player.h;
+}];
 

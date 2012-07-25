@@ -17,6 +17,9 @@ body {
 .no-margin {
     margin: 0 !important;
 }
+.top-margin-small {
+    margin-top: 4px;
+}
 .no-border-top {
     border-top: 0 black none !important;
 }
