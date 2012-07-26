@@ -33,6 +33,13 @@ Number.prototype.toMinutesSeconds = function() {
     return (minutes < 10 ? '0': '') + minutes + ":" + (seconds < 10 ? '0': '') + seconds;
 };
 
+function normalizedUpdateCounter(newValue) {
+    if ((newValue / 1000) % 2 != 0) {
+        newValue += 1000;
+    }
+    return newValue;
+}
+
 /**
  * Main controller.
  * Start the scheduler for the round & step.
@@ -48,14 +55,8 @@ droidarena.controller('play', function($scope, $http, $timeout) {
     $scope.localTimer = Math.floor(new Date().getTime() / 1000) * 1000;
     $scope.serverOffset = 0;
 
-    $scope.updateCounter = $scope.localTimer;
+    $scope.updateCounter = normalizedUpdateCounter($scope.localTimer);
     $scope.roundCounter = 0;
-
-    if (($scope.updateCounter / 1000) % 2 != 0) {
-        $scope.updateCounter += 1000;
-    }
-
-    console.log($scope.updateCounter + " " + new Date($scope.updateCounter));
 
     /**
      * Get the time with the offset from the server.
@@ -101,6 +102,7 @@ droidarena.controller('play', function($scope, $http, $timeout) {
     $scope.scheduleNextRound = function() {
         $http.get(BASE_URL + 'time').success(function(data) {
             $scope.serverOffset = $scope.localTimer - Math.floor(data.c / 1000) * 1000;
+            $scope.updateCounter = normalizedUpdateCounter($scope.localTimer - $scope.serverOffset);
             $scope.roundCounter = data.r;
             $scope.timeSynchronized = true;
         });
@@ -123,7 +125,7 @@ droidarena.directive('updateTimer', function() {
         },
         link: function postLink($scope, $element) {
             $scope.$watch('localTimer', function(newValue, oldValue) {
-                var counter = $scope.updateCounter - newValue;
+                var counter = $scope.updateCounter + $scope.serverOffset - newValue;
                 if (counter == $scope.updateTimer) {
                     $element.removeClass('half-rotate');
                 } else if (counter == $scope.updateTimer / 2) {
@@ -143,8 +145,8 @@ droidarena.directive('updateTimerRotate', function() {
         restrict: 'C',
         link: function postLink($scope, $element, $attributes, $timer) {
             $scope.$watch('localTimer', function(newValue, oldValue) {
-                var oldCounter = oldValue - $scope.updateCounter;
-                var newCounter = newValue - $scope.updateCounter;
+                var oldCounter = oldValue - $scope.updateCounter - $scope.serverOffset;
+                var newCounter = newValue - $scope.updateCounter - $scope.serverOffset;
                 var angle = 360 * (oldCounter / $scope.updateTimer);
                 var newAngle = 360 * (newCounter / $scope.updateTimer);
                 $element.rotate({ duration: 250, angle: angle, animateTo: newAngle});
