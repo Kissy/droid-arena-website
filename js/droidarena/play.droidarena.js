@@ -288,7 +288,7 @@ var PlayerListCtrl = ['$scope', '$http', '$timeout', function PlayerListCtrl($sc
 
     $scope.refreshPlayers();
     $scope.$watch('localTimer', function(newValue, oldValue) {
-        if ((newValue / 1000) % 2 == 1) {
+        if (((newValue + $scope.serverOffset) / 1000) % 2 == 1) {
             $timeout($scope.refreshPlayers, 500);
         }
     });
