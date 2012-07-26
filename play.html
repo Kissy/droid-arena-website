@@ -46,7 +46,12 @@
                     <thead>
                     <tr>
                         <th>Server Time</th>
-                        <td class="ng-cloak right-text">{{localTimer + serverOffset | date:'H:mm:ss'}}</td>
+                        <td class="ng-cloak right-text">
+                            <ng-switch on="loading">
+                                <span ng-switch-when="true">-</span>
+                                <span ng-switch-default>{{localTimer - serverOffset | date:'H:mm:ss'}}</span>
+                            </ng-switch>
+                        </td>
                     </tr>
                     </thead>
                     <tbody>

@@ -24,15 +24,36 @@ var BIG_LOADER_SETTINGS = {
 
 var droidarena = angular.module('droidarena', []);
 
-Number.prototype.toMinutesSeconds = function() {
-    if (isNaN(this)) {
+/**
+ * Format a number to a as minute & seconds.
+ *
+ * @return {String} The number & minute seconds as string.
+ */
+function toMinutesSeconds(number) {
+    if (isNaN(number)) {
         return "";
     }
-    var seconds = this % 60;
-    var minutes = (this - seconds) / 60;
+    var seconds = number % 60;
+    var minutes = (number - seconds) / 60;
     return (minutes < 10 ? '0': '') + minutes + ":" + (seconds < 10 ? '0': '') + seconds;
 };
 
+
+/**
+ * Get the local timer normalized.
+ *
+ * @return {Number} The local timer normalized.
+ */
+function getLocalTimerNormalized() {
+    return Math.floor(new Date().getTime() / 1000) * 1000;
+}
+
+/**
+ * Normalized the update counter.
+ *
+ * @param newValue The new value for the update counter.
+ * @return {Number} The normalized value for the update counter.
+ */
 function normalizedUpdateCounter(newValue) {
     if ((newValue / 1000) % 2 != 0) {
         newValue += 1000;
@@ -52,10 +73,10 @@ droidarena.controller('play', function($scope, $http, $timeout) {
     $scope.roundRunning = false;
     $scope.timeSynchronized = false;
 
-    $scope.localTimer = Math.floor(new Date().getTime() / 1000) * 1000;
+    $scope.localTimer = 0;
     $scope.serverOffset = 0;
 
-    $scope.updateCounter = normalizedUpdateCounter($scope.localTimer);
+    $scope.updateCounter = 0;
     $scope.roundCounter = 0;
 
     /**
@@ -101,6 +122,7 @@ droidarena.controller('play', function($scope, $http, $timeout) {
      */
     $scope.scheduleNextRound = function() {
         $http.get(BASE_URL + 'time').success(function(data) {
+            $scope.localTimer = getLocalTimerNormalized();
             $scope.serverOffset = $scope.localTimer - Math.floor(data.c / 1000) * 1000;
             $scope.updateCounter = normalizedUpdateCounter($scope.localTimer - $scope.serverOffset);
             $scope.roundCounter = data.r;
@@ -108,9 +130,15 @@ droidarena.controller('play', function($scope, $http, $timeout) {
         });
     };
 
+    var removeTimeSynchronizedWatch = $scope.$watch('timeSynchronized', function(newValue, oldValue) {
+        if (newValue) {
+            removeTimeSynchronizedWatch();
+            $timeout($scope.scheduleNextStep, 1000 + $scope.localTimer - new Date().getTime());
+        }
+    });
+
     // Launch the first round.
     $scope.scheduleNextRound();
-    $timeout($scope.scheduleNextStep, 1000 + $scope.localTimer - new Date().getTime());
 });
 
 /**
@@ -125,7 +153,12 @@ droidarena.directive('updateTimer', function() {
         },
         link: function postLink($scope, $element) {
             $scope.$watch('localTimer', function(newValue, oldValue) {
-                var counter = $scope.updateCounter + $scope.serverOffset - newValue;
+                if ($scope.loading) {
+                    $element.removeClass('half-rotate');
+                    return;
+                }
+
+                var counter = $scope.updateCounter - newValue + $scope.serverOffset;
                 if (counter == $scope.updateTimer) {
                     $element.removeClass('half-rotate');
                 } else if (counter == $scope.updateTimer / 2) {
@@ -145,8 +178,13 @@ droidarena.directive('updateTimerRotate', function() {
         restrict: 'C',
         link: function postLink($scope, $element, $attributes, $timer) {
             $scope.$watch('localTimer', function(newValue, oldValue) {
-                var oldCounter = oldValue - $scope.updateCounter - $scope.serverOffset;
-                var newCounter = newValue - $scope.updateCounter - $scope.serverOffset;
+                if ($scope.loading) {
+                    $element.rotate(360);
+                    return;
+                }
+
+                var oldCounter = oldValue - $scope.serverOffset - $scope.updateCounter;
+                var newCounter = newValue - $scope.serverOffset - $scope.updateCounter;
                 var angle = 360 * (oldCounter / $scope.updateTimer);
                 var newAngle = 360 * (newCounter / $scope.updateTimer);
                 $element.rotate({ duration: 250, angle: angle, animateTo: newAngle});
@@ -174,7 +212,7 @@ droidarena.directive('roundTimer', function() {
                             return;
                         }
 
-                        var counter = $scope.roundCounter - newValue;
+                        var counter = $scope.roundCounter - newValue + $scope.serverOffset;
                         if (counter >= $scope.roundTimer / 2) {
                             $element.removeClass('half-rotate');
                         } else {
@@ -202,8 +240,8 @@ droidarena.directive('roundTimerDisplay', function() {
             $scope.$watch('roundRunning', function(newValue, oldValue) {
                 if (newValue) {
                     stopRoundTimer = $scope.$watch('localTimer', function(newValue, oldValue) {
-                        var counter = $scope.roundCounter - newValue;
-                        $element.html(Math.ceil(counter / 1000).toMinutesSeconds());
+                        var counter = $scope.roundCounter - newValue + $scope.serverOffset;
+                        $element.html(toMinutesSeconds(Math.ceil(counter / 1000)));
                     });
                 } else {
                     stopRoundTimer();
@@ -226,8 +264,8 @@ droidarena.directive('roundTimerRotate', function() {
             $scope.$watch('roundRunning', function(newValue, oldValue) {
                 if (newValue) {
                     stopRoundTimer = $scope.$watch('localTimer', function(newValue, oldValue) {
-                        var oldCounter = $scope.roundCounter - oldValue;
-                        var newCounter = $scope.roundCounter - newValue;
+                        var oldCounter = $scope.roundCounter - oldValue + $scope.serverOffset;
+                        var newCounter = $scope.roundCounter - newValue + $scope.serverOffset;
                         var angle = 360 * (oldCounter / $scope.roundTimer);
                         var newAngle = 360 * (newCounter / $scope.roundTimer);
                         $element.rotate({ duration: 250, angle: angle, animateTo: newAngle});
@@ -288,7 +326,7 @@ var PlayerListCtrl = ['$scope', '$http', '$timeout', function PlayerListCtrl($sc
 
     $scope.refreshPlayers();
     $scope.$watch('localTimer', function(newValue, oldValue) {
-        if (((newValue + $scope.serverOffset) / 1000) % 2 == 1) {
+        if (((newValue - $scope.serverOffset) / 1000) % 2 == 1) {
             $timeout($scope.refreshPlayers, 500);
         }
     });
